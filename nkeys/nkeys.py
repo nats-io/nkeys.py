@@ -15,8 +15,6 @@
 import base64
 import ed25519
 
-__version__ = "0.1.0"
-
 # PREFIX_BYTE_SEED is the version byte used for encoded NATS Seeds
 PREFIX_BYTE_SEED     = 18 << 3    # Base32-encodes to 'S...'
 
