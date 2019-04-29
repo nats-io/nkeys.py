@@ -92,6 +92,7 @@ class KeyPair(object):
                  seed=None,
                  keys=None,
                  public_key=None,
+                 private_key=None,
                  ):
         """
         NKEYS KeyPair used to sign and verify data.
@@ -99,36 +100,55 @@ class KeyPair(object):
         :param seed: The seed as a bytearray used to create the keypair.
         :param keys: The keypair that can be used for signing.
         :param public_key: The public key as a bytearray.
+
+        :rtype: nkeys.Keypair
+        :return: A KeyPair that can be used to sign and verify data.
         """
         self._seed = seed
         self._keys = keys
         self._public_key = public_key
+        self._private_key = private_key
 
     def sign(self, input):
         """
         NKEYS KeyPair used to sign and verify data.
 
         :param input: The payload in bytes to sign.
+
+        :rtype bytes:
+        :return: The raw bytes representing the signed data.
         """
         return self._keys.sign(input)
 
     def verify(self, input, sig):
         """
-        NKEYS KeyPair used to sign and verify data.
-
         :param input: The payload in bytes that was signed.
         :param sig: The signature in bytes that will be verified.
+
+        :rtype bool:
+        :return: boolean expressing that the signature is valid.
         """
         kp = self._keys.get_verifying_key()
-        return kp.verify(input, sig)
+
+        try:
+            kp.verify(input, sig)
+            return True
+        except ed25519.BadSignatureError:
+            raise ErrInvalidSignature()
 
     @property
     def public_key(self):
+        """
+        Return the encoded public key associated with the KeyPair.
+
+        :rtype bytes:
+        :return: public key associated with the key pair
+        """
         # If already generated then just return.
         if self._public_key is not None:
             return self._public_key
 
-        # Get the public key from the seed
+        # Get the public key from the seed to verify later.
         prefix, _ = decode_seed(self._seed)
 
         kp = self._keys.get_verifying_key()
@@ -142,20 +162,37 @@ class KeyPair(object):
 
         # Encode to base32
         base32_encoded = base64.b32encode(src)
-        self._public_key = base32_encoded.decode()
+        del src
+        self._public_key = base32_encoded
         return self._public_key
 
     @property
     def private_key(self):
-        pass
+        if self._private_key is not None:
+            return self._private_key
+
+        src = bytearray(self._keys.to_bytes())
+        src.insert(0, PREFIX_BYTE_PRIVATE)
+
+        # Calculate and include crc16 checksum
+        crc = crc16(src)
+        crc_bytes = (crc).to_bytes(2, byteorder='little')
+        src.extend(crc_bytes)
+
+        base32_encoded = base64.b32encode(src)
+        del src
+        self._private_key = base32_encoded[:(len(base32_encoded)-4)]
+        return self._private_key
 
     def wipe(self):
         self._seed = None
         self._keys = None
         self._public_key = None
+        self._private_key = None
         del self._seed
         del self._keys
         del self._public_key
+        del self._private_key
 
 CRC16TAB = [
     0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,

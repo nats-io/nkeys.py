@@ -100,10 +100,38 @@ class NkeysTest(NatsTestCase):
         kp = nkeys.from_seed(encoded_seed)
         nonce = b'NcMQZSlX2lZ3Y4w'
         sig = kp.sign(nonce)
-        kp.verify(sig, nonce)
-
-        with self.assertRaises(ed25519.BadSignatureError):
+        self.assertTrue(kp.verify(sig, nonce))
+        with self.assertRaises(nkeys.ErrInvalidSignature):
             kp.verify(sig, nonce+b'asdf')
+
+    def test_keypair_public_key(self):
+        seed = "SUAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU"
+        encoded_seed = bytearray(seed.encode())
+        kp = nkeys.from_seed(encoded_seed)
+
+        self.assertEqual(None, kp._public_key)
+        self.assertEqual(b"UCK5N7N66OBOINFXAYC2ACJQYFSOD4VYNU6APEJTAVFZB2SVHLKGEW7L", kp.public_key)
+
+        # Confirm that the public key is wiped as well.
+        kp.wipe()
+        with self.assertRaises(AttributeError):
+            kp._public_key
+
+    def test_keypair_private_key(self):
+        seed = "SUAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU"
+        encoded_seed = bytearray(seed.encode())
+        kp = nkeys.from_seed(encoded_seed)
+        self.assertEqual(None, kp._public_key)
+
+        priv = kp.private_key
+        self.assertEqual(b"PDC2WWLK67NUTFW7ZH5A7FOPZC32VXYZYWYNQMQ6RQWP2FEEF6KDVFOW7W7PHAXEGS3QMBNABEYMCZHB6K4G2PAHSEZQKS4Q5JKTVVDCJORA", priv)
+
+        # Confirm that the private_key is wiped as well.
+        kp.wipe()
+        with self.assertRaises(AttributeError):
+            kp._keys
+        with self.assertRaises(AttributeError):
+            kp._private_key
 
 if __name__ == '__main__':
     runner = unittest.TextTestRunner(stream=sys.stdout)
