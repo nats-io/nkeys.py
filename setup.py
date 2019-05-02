@@ -14,7 +14,7 @@ from setuptools import find_packages, setup, Command
 NAME = 'nkeys'
 DESCRIPTION = 'A public-key signature system based on Ed25519 for the NATS ecosystem.'
 URL = 'https://github.com/nats-io/nkeys.py'
-EMAIL = 'wally@synadia.com'
+EMAIL = 'wally@nats.io'
 AUTHOR = 'Waldemar Quevedo'
 REQUIRES_PYTHON = '>=3.7.0'
 VERSION = None
