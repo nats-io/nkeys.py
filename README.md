@@ -20,6 +20,40 @@ Dealing with 32 byte and 64 byte raw keys can be challenging. NKEYS is designed 
 pip install nkeys
 ```
 
+## Basic API Usage
+
+```python
+import nkeys
+import os
+
+# Create an NKEYS KeyPair from a seed file.
+user = None
+with open("user.nkey", 'rb', buffering=0) as f:
+
+  # We compute the size of the file to allocate the required
+  # bytearray size in order to have control over the memory
+  # and be able to wipe it once the keys are not needed anymore.
+  seed = bytearray(os.fstat(f.fileno()).st_size)
+  f.readinto(seed)
+  user = nkeys.from_seed(seed)
+
+# Sign some data with the KeyPair user.
+data = b'arGTKH8q7XDmgy0'
+sig = user.sign(data)
+
+# Verify the signature
+try: 
+  user.verify(data, sig)
+except nkeys.ErrInvalidSignature as e:
+  print("Error:", e)
+
+# Access the seed, the only thing that needs to be stored and kept safe.
+print(user.seed)
+
+# Remove any secrets that were in use by the KeyPair.
+user.wipe()
+```
+
 ## License
 
 Unless otherwise noted, the NATS source files are distributed under the Apache Version 2.0 license found in the LICENSE file.
