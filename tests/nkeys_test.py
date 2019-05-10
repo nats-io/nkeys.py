@@ -104,6 +104,17 @@ class NkeysTest(NatsTestCase):
         with self.assertRaises(nkeys.ErrInvalidSignature):
             kp.verify(nonce+b'asdf', sig)
 
+    def test_keypair_seed_property(self):
+        seed = bytearray(b"SUAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU")
+        kp = nkeys.from_seed(seed)
+        self.assertEqual(kp.seed, seed)
+
+        # Throw away the seed.
+        kp.wipe()
+
+        with self.assertRaises(nkeys.ErrInvalidSeed):
+            kp.seed
+
     def test_keypair_public_key(self):
         seed = "SUAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU"
         encoded_seed = bytearray(seed.encode())

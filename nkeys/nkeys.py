@@ -184,6 +184,12 @@ class KeyPair(object):
         self._private_key = base32_encoded[:(len(base32_encoded)-4)]
         return self._private_key
 
+    @property
+    def seed(self):
+        if not hasattr(self, "_seed"):
+            raise ErrInvalidSeed()
+        return self._seed
+
     def wipe(self):
         self._seed = None
         self._keys = None
