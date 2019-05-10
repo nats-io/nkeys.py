@@ -51,8 +51,9 @@ def run():
         show_usage_and_die()
 
     # Create keypair from seed.
-    seed = bytearray(58)
+    seed = None
     with open(args.inkey, 'rb', buffering=0) as f:
+        seed = bytearray(os.fstat(f.fileno()).st_size)
         f.readinto(seed)
 
     if len(args.sign) > 0:
