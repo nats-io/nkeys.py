@@ -100,9 +100,9 @@ class NkeysTest(NatsTestCase):
         kp = nkeys.from_seed(encoded_seed)
         nonce = b'NcMQZSlX2lZ3Y4w'
         sig = kp.sign(nonce)
-        self.assertTrue(kp.verify(sig, nonce))
+        self.assertTrue(kp.verify(nonce, sig))
         with self.assertRaises(nkeys.ErrInvalidSignature):
-            kp.verify(sig, nonce+b'asdf')
+            kp.verify(nonce+b'asdf', sig)
 
     def test_keypair_public_key(self):
         seed = "SUAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU"

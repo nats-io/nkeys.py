@@ -131,7 +131,7 @@ class KeyPair(object):
         kp = self._keys.get_verifying_key()
 
         try:
-            kp.verify(input, sig)
+            kp.verify(sig, input)
             return True
         except ed25519.BadSignatureError:
             raise ErrInvalidSignature()
