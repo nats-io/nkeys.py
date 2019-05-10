@@ -44,9 +44,10 @@ def from_seed(seed):
 
 def decode_seed(src):
     # Add missing padding if required.
-    src += b'=' * (-len(src) % 8)
+    padding = bytearray()
+    padding += b'=' * (-len(src) % 8)
 
-    base32_decoded = base64.b32decode(src)
+    base32_decoded = base64.b32decode(src+padding)
     raw = base32_decoded[:(len(base32_decoded)-2)]
 
     # 248 = 11111000

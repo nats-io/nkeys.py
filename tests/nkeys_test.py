@@ -107,7 +107,7 @@ class NkeysTest(NatsTestCase):
     def test_keypair_seed_property(self):
         seed = bytearray(b"SUAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU")
         kp = nkeys.from_seed(seed)
-        self.assertEqual(kp.seed, seed)
+        self.assertEqual(kp.seed, bytearray(b"SUAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU"))
 
         # Throw away the seed.
         kp.wipe()
