@@ -16,7 +16,7 @@ DESCRIPTION = 'A public-key signature system based on Ed25519 for the NATS ecosy
 URL = 'https://github.com/nats-io/nkeys.py'
 EMAIL = 'wally@nats.io'
 AUTHOR = 'Waldemar Quevedo'
-REQUIRES_PYTHON = '>=3.7.0'
+REQUIRES_PYTHON = '>=3.6.0'
 VERSION = None
 
 # Required and optional/extra packages.
@@ -61,8 +61,8 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy'
+        'Programming Language :: Python :: Implementation :: CPython'
     ],
 )

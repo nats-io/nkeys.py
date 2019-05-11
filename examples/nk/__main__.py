@@ -77,7 +77,7 @@ def run():
             signed_data = base64.b64decode(encoded_data)
 
         user = nkeys.from_seed(seed)
-        if user.verify(signed_data, data):
+        if user.verify(data, signed_data):
             print("Verified OK")
             sys.exit(0)
 
