@@ -13,6 +13,7 @@
 #
 
 import base64
+import binascii
 import ed25519
 
 # PREFIX_BYTE_SEED is the version byte used for encoded NATS Seeds
@@ -47,8 +48,14 @@ def decode_seed(src):
     padding = bytearray()
     padding += b'=' * (-len(src) % 8)
 
-    base32_decoded = base64.b32decode(src+padding)
-    raw = base32_decoded[:(len(base32_decoded)-2)]
+    try:
+        base32_decoded = base64.b32decode(src+padding)
+        raw = base32_decoded[:(len(base32_decoded)-2)]
+    except binascii.Error:
+        raise ErrInvalidSeed()
+
+    if len(raw) < 32:
+        raise ErrInvalidSeed()
 
     # 248 = 11111000
     b1 = raw[0] & 248

@@ -40,13 +40,17 @@ class NkeysTest(NatsTestCase):
         self.assertEqual(sig, b'ZaAiVDgB5CeYoXoQ7cBCmq+ZllzUnGUoDVb8C7PilWvCs8XKfUchAUhz2P4BYAF++Dg3w05CqyQFRDiGL6LrDw==')
 
     def test_from_seed_keypair_bad_padding(self):
-        with self.assertRaises(binascii.Error):
+        with self.assertRaises(nkeys.ErrInvalidSeed):
             seed = "UAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU"
             nkeys.from_seed(bytearray(seed.encode()))
 
     def test_from_seed_keypair_invalid_seed(self):
         with self.assertRaises(nkeys.ErrInvalidSeed):
             seed = "AUAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU"
+            nkeys.from_seed(bytearray(seed.encode()))
+
+        with self.assertRaises(nkeys.ErrInvalidSeed):
+            seed = ""
             nkeys.from_seed(bytearray(seed.encode()))
 
     def test_from_seed_keypair_valid_prefix_byte(self):
