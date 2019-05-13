@@ -1,6 +1,8 @@
 # NKEYS for Python3
 
 [![License Apache 2](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![Build Status](https://travis-ci.org/nats-io/nkeys.py.svg?branch=master)](http://travis-ci.org/nats-io/nkeys.py)
+[![Versions](https://img.shields.io/pypi/pyversions/nkeys.svg)](https://pypi.org/project/nkeys)
 
 A public-key signature system based on [Ed25519](https://ed25519.cr.yp.to/) for the NATS ecosystem.
 
