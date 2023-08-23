@@ -4,7 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [packages]
-ed25519 = "*"
+pynacl = "*"
 
 [dev-packages]
 pytest = ">=2.8.0,<4.1"

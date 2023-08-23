@@ -14,7 +14,9 @@
 
 import base64
 import binascii
-import ed25519
+import nacl.signing
+import nacl.exceptions
+import nacl.public
 
 # PREFIX_BYTE_SEED is the version byte used for encoded NATS Seeds
 PREFIX_BYTE_SEED     = 18 << 3    # Base32-encodes to 'S...'
@@ -39,7 +41,7 @@ PREFIX_BYTE_USER     = 20 << 3    # Base32-encodes to 'U...'
 
 def from_seed(seed):
     _, raw_seed = decode_seed(seed)
-    keys = ed25519.SigningKey(raw_seed)
+    keys = nacl.signing.SigningKey(raw_seed)
     del raw_seed
     return KeyPair(keys=keys, seed=seed)
 
@@ -113,8 +115,8 @@ class KeyPair(object):
         :return: A KeyPair that can be used to sign and verify data.
         """
         self._seed = seed
-        self._keys = keys
-        self._public_key = public_key
+        self._keys: nacl.signing.SigningKey = keys
+        self._public_key: nacl.signing.VerifyKey = public_key
         self._private_key = private_key
 
     def sign(self, input):
@@ -126,7 +128,7 @@ class KeyPair(object):
         :rtype bytes:
         :return: The raw bytes representing the signed data.
         """
-        return self._keys.sign(input)
+        return self._keys.sign(input).signature
 
     def verify(self, input, sig):
         """
@@ -136,12 +138,12 @@ class KeyPair(object):
         :rtype bool:
         :return: boolean expressing that the signature is valid.
         """
-        kp = self._keys.get_verifying_key()
+        kp = self._keys.verify_key
 
         try:
-            kp.verify(sig, input)
+            kp.verify(input, sig)
             return True
-        except ed25519.BadSignatureError:
+        except nacl.exceptions.BadSignatureError:
             raise ErrInvalidSignature()
 
     @property
@@ -159,8 +161,8 @@ class KeyPair(object):
         # Get the public key from the seed to verify later.
         prefix, _ = decode_seed(self._seed)
 
-        kp = self._keys.get_verifying_key()
-        src = bytearray(kp.to_bytes())
+        kp = self._keys.verify_key
+        src = bytearray(bytes(kp))
         src.insert(0, prefix)
 
         # Calculate and include crc16 checksum
@@ -179,7 +181,7 @@ class KeyPair(object):
         if self._private_key is not None:
             return self._private_key
 
-        src = bytearray(self._keys.to_bytes())
+        src = bytearray(bytes(self._keys._signing_key))
         src.insert(0, PREFIX_BYTE_PRIVATE)
 
         # Calculate and include crc16 checksum
