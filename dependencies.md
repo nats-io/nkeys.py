@@ -2,6 +2,6 @@
 
 This file lists the dependencies used in this repository.
 
-| Dependency | License |
-|-|-|
-| github.com/warner/python-ed25519 | Modified MIT License |
+| Dependency | License     |
+|-|-------------|
+| https://github.com/pyca/pynacl | Apache 2.0 |
