@@ -20,7 +20,7 @@ REQUIRES_PYTHON = '>=3.6.0'
 VERSION = None
 
 # Required and optional/extra packages.
-REQUIRED = ['ed25519']
+REQUIRED = ['pynacl']
 EXTRAS = {}
 
 # ------------------------------------------------
