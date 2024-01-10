@@ -17,6 +17,15 @@ import sys
 import nkeys
 import binascii
 import base64
+import os
+
+PREFIXES = [
+        nkeys.PREFIX_BYTE_OPERATOR,
+        nkeys.PREFIX_BYTE_SERVER,
+        nkeys.PREFIX_BYTE_CLUSTER,
+        nkeys.PREFIX_BYTE_ACCOUNT,
+        nkeys.PREFIX_BYTE_USER
+]
 
 
 class NatsTestCase(unittest.TestCase):
@@ -170,6 +179,21 @@ class NkeysTest(NatsTestCase):
             kp._keys
         with self.assertRaises(AttributeError):
             kp._private_key
+
+    def test_roundtrip_seed_encoding(self):
+        # This test is a low-tech property test in disguise,
+        # testing the property:
+        #   decode . encode == identity
+        # Using a proper framework like hypothesis might be preferable.
+        num_trials = 500
+        raw_seeds = [os.urandom(32) for _ in range(num_trials)]
+        for raw_seed in raw_seeds:
+            for prefix in PREFIXES:
+                with self.subTest(rawseed=raw_seed, prefix=prefix):
+                    encoded_seed = nkeys.encode_seed(raw_seed, prefix)
+                    decoded_prefix, decoded_seed = nkeys.decode_seed(encoded_seed)
+                    self.assertEqual(prefix, decoded_prefix)
+                    self.assertEqual(raw_seed, decoded_seed)
 
 
 if __name__ == '__main__':
