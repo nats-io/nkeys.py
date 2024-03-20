@@ -9,8 +9,5 @@ pynacl = "*"
 [dev-packages]
 pytest = ">=2.8.0,<4.1"
 
-[requires]
-python_version = "3.7"
-
 [scripts]
 tests = "python tests/nkeys_test.py"
