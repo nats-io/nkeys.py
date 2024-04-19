@@ -18,11 +18,16 @@ import nkeys
 import binascii
 import base64
 
+
 class NatsTestCase(unittest.TestCase):
 
     def setUp(self):
-        print("\n=== RUN {0}.{1}".format(
-            self.__class__.__name__, self._testMethodName))
+        print(
+            "\n=== RUN {0}.{1}".format(
+                self.__class__.__name__, self._testMethodName
+            )
+        )
+
 
 class NkeysTest(NatsTestCase):
 
@@ -36,7 +41,10 @@ class NkeysTest(NatsTestCase):
         kp = nkeys.from_seed(bytearray(seed.encode()))
         raw = kp.sign(b"PXoWU7zWAMt75FY")
         sig = base64.b64encode(raw)
-        self.assertEqual(sig, b'ZaAiVDgB5CeYoXoQ7cBCmq+ZllzUnGUoDVb8C7PilWvCs8XKfUchAUhz2P4BYAF++Dg3w05CqyQFRDiGL6LrDw==')
+        self.assertEqual(
+            sig,
+            b'ZaAiVDgB5CeYoXoQ7cBCmq+ZllzUnGUoDVb8C7PilWvCs8XKfUchAUhz2P4BYAF++Dg3w05CqyQFRDiGL6LrDw=='
+        )
 
     def test_from_seed_keypair_bad_padding(self):
         with self.assertRaises(nkeys.ErrInvalidSeed):
@@ -58,7 +66,7 @@ class NkeysTest(NatsTestCase):
             "SCAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU",
             "SOAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU",
             "SUAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU"
-            ]
+        ]
         for seed in seeds:
             nkeys.from_seed(bytearray(seed.encode()))
 
@@ -68,7 +76,7 @@ class NkeysTest(NatsTestCase):
             b'SDAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU',
             b'PWAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU',
             b'PMAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU'
-            ]
+        ]
         with self.assertRaises(nkeys.ErrInvalidPrefixByte):
             for seed in seeds:
                 nkeys.from_seed(bytearray(seed))
@@ -90,7 +98,10 @@ class NkeysTest(NatsTestCase):
         kp = nkeys.from_seed(encoded_seed)
 
         self.assertEqual(None, kp._public_key)
-        self.assertEqual("UCK5N7N66OBOINFXAYC2ACJQYFSOD4VYNU6APEJTAVFZB2SVHLKGEW7L", kp.public_key)
+        self.assertEqual(
+            "UCK5N7N66OBOINFXAYC2ACJQYFSOD4VYNU6APEJTAVFZB2SVHLKGEW7L",
+            kp.public_key
+        )
 
         # Confirm that the public key is wiped as well.
         kp.wipe()
@@ -105,12 +116,19 @@ class NkeysTest(NatsTestCase):
         sig = kp.sign(nonce)
         self.assertTrue(kp.verify(nonce, sig))
         with self.assertRaises(nkeys.ErrInvalidSignature):
-            kp.verify(nonce+b'asdf', sig)
+            kp.verify(nonce + b'asdf', sig)
 
     def test_keypair_seed_property(self):
-        seed = bytearray(b"SUAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU")
+        seed = bytearray(
+            b"SUAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU"
+        )
         kp = nkeys.from_seed(seed)
-        self.assertEqual(kp.seed, bytearray(b"SUAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU"))
+        self.assertEqual(
+            kp.seed,
+            bytearray(
+                b"SUAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU"
+            )
+        )
 
         # Throw away the seed.
         kp.wipe()
@@ -124,7 +142,10 @@ class NkeysTest(NatsTestCase):
         kp = nkeys.from_seed(encoded_seed)
 
         self.assertEqual(None, kp._public_key)
-        self.assertEqual(b"UCK5N7N66OBOINFXAYC2ACJQYFSOD4VYNU6APEJTAVFZB2SVHLKGEW7L", kp.public_key)
+        self.assertEqual(
+            b"UCK5N7N66OBOINFXAYC2ACJQYFSOD4VYNU6APEJTAVFZB2SVHLKGEW7L",
+            kp.public_key
+        )
 
         # Confirm that the public key is wiped as well.
         kp.wipe()
@@ -138,7 +159,10 @@ class NkeysTest(NatsTestCase):
         self.assertEqual(None, kp._public_key)
 
         priv = kp.private_key
-        self.assertEqual(b"PDC2WWLK67NUTFW7ZH5A7FOPZC32VXYZYWYNQMQ6RQWP2FEEF6KDVFOW7W7PHAXEGS3QMBNABEYMCZHB6K4G2PAHSEZQKS4Q5JKTVVDCJORA", priv)
+        self.assertEqual(
+            b"PDC2WWLK67NUTFW7ZH5A7FOPZC32VXYZYWYNQMQ6RQWP2FEEF6KDVFOW7W7PHAXEGS3QMBNABEYMCZHB6K4G2PAHSEZQKS4Q5JKTVVDCJORA",
+            priv
+        )
 
         # Confirm that the private_key is wiped as well.
         kp.wipe()
@@ -146,6 +170,7 @@ class NkeysTest(NatsTestCase):
             kp._keys
         with self.assertRaises(AttributeError):
             kp._private_key
+
 
 if __name__ == '__main__':
     runner = unittest.TextTestRunner(stream=sys.stdout)
