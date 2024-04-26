@@ -79,6 +79,49 @@ def decode_seed(src):
     return (prefix, result)
 
 
+def encode_seed(src, prefix):
+    """
+    :param src: A bytestring of length 32, used as the seed
+                for an nkey.
+    :param prefix: A prefix describing the nkey roll, one of:
+                   PREFIX_BYTE_SERVER, PREFIX_BYTE_CLUSTER,
+                   PREFIX_BYTE_OPERATOR, PREFIX_BYTE_ACCOUNT,
+                   or PREFIX_BYTE_USER
+
+    :rtype bytestring:
+    :return: nkey-encoded seed
+    """
+
+    if not valid_public_prefix_byte(prefix):
+        raise ErrInvalidPrefixByte()
+
+    if len(src) != 32:
+        raise ErrInvalidSeedLen()
+
+    # The first five bits of the first byte
+    # contain the first base32 character,
+    # encoding 'S' for seed.
+    # The last three bytes of the first byte
+    # contain the first three bits of the second
+    # base32 character, which encodes the roll.
+    first_byte = PREFIX_BYTE_SEED | prefix >> 5
+
+    # The forth and fifth bits of the the second byte
+    # contain the last two bits of the second base32
+    # charater, which encodes the roll.
+    # Note that:
+    #   31 decimal == 00011111 binary
+    # and is therefore a mask for the last 5 bits.
+    # Note that the last three bits of the second byte
+    # are entirely unused.
+    second_byte = (31 & prefix) << 3
+
+    header = bytearray([first_byte, second_byte])
+    checksum = crc16_checksum(header + bytearray(src))
+    final_bytes = bytes(header) + src + bytes(checksum)
+    return base64.b32encode(final_bytes).rstrip(b'=')
+
+
 def valid_public_prefix_byte(prefix):
     if prefix == PREFIX_BYTE_OPERATOR \
        or prefix == PREFIX_BYTE_SERVER \
@@ -480,6 +523,11 @@ def crc16(data):
     for c in data:
         crc = ((crc << 8) & 0xffff) ^ CRC16TAB[((crc >> 8) ^ c) & 0x00FF]
     return crc
+
+
+def crc16_checksum(data):
+    crc = crc16(data)
+    return crc.to_bytes(2, byteorder='little')
 
 
 class NkeysError(Exception):
