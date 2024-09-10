@@ -26,6 +26,7 @@ classifiers = [
     'Programming Language :: Python :: 3.12',
     'Programming Language :: Python :: Implementation :: CPython',
 ]
+dependencies = ["pynacl"]
 
 [project.urls]
 "Homepage" = "https://github.com/nats-io/nkeys.py"
