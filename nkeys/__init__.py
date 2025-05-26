@@ -146,6 +146,53 @@ def valid_prefix_byte(prefix):
         return False
 
 
+def verifying_nkey_to_ed25519(public_nkey):
+    """
+    :param public_nkey: The public nkey as a bytearray.
+    :rtype nacl.signing.VerifyKey:
+    :return: PyNaCl Verifying Key
+    """
+    try:
+        decoded_nkey = base64.b32decode(public_nkey)
+    except Exception:
+        raise ErrInvalidEncoding()
+
+    if len(decoded_nkey) != 35:
+        raise ErrInvalidPublicKey()
+
+    prefix = decoded_nkey[0]
+    if not valid_public_prefix_byte(prefix):
+        raise ErrInvalidPrefixByte()
+
+    # the first byte of the base32 decoded nkey is the prefix
+    # the last two bytes of the base32 decoded nkey is the crc16 checksum
+    key_without_checksum, checksum = decoded_nkey[:-2], decoded_nkey[-2:]
+
+    if checksum != crc16_checksum(key_without_checksum):
+        raise ErrInvalidCheckSum()
+
+    # remove the nkey prefix to produce the bare ED25519 verifying key
+    bare_key = key_without_checksum[1:]
+    return nacl.signing.VerifyKey(bare_key)
+
+
+def verify(public_nkey, input, sig):
+    """
+    :param public_nkey: The public nkey as a bytearray.
+    :param input: The payload in bytes that was signed.
+    :param sig: The signature in bytes that will be verified.
+    :rtype bool:
+    :return: boolean expressing that the signature is valid.
+    """
+    vk = verifying_nkey_to_ed25519(public_nkey)
+
+    try:
+        vk.verify(input, sig)
+        return True
+    except nacl.exceptions.BadSignatureError:
+        raise ErrInvalidSignature()
+
+
 class KeyPair(object):
 
     def __init__(
@@ -189,13 +236,7 @@ class KeyPair(object):
         :rtype bool:
         :return: boolean expressing that the signature is valid.
         """
-        kp = self._keys.verify_key
-
-        try:
-            kp.verify(input, sig)
-            return True
-        except nacl.exceptions.BadSignatureError:
-            raise ErrInvalidSignature()
+        return verify(self.public_key, input, sig)
 
     @property
     def public_key(self):
@@ -217,8 +258,7 @@ class KeyPair(object):
         src.insert(0, prefix)
 
         # Calculate and include crc16 checksum
-        crc = crc16(src)
-        crc_bytes = (crc).to_bytes(2, byteorder='little')
+        crc_bytes = crc16_checksum(src)
         src.extend(crc_bytes)
 
         # Encode to base32
@@ -236,8 +276,7 @@ class KeyPair(object):
         src.insert(0, PREFIX_BYTE_PRIVATE)
 
         # Calculate and include crc16 checksum
-        crc = crc16(src)
-        crc_bytes = (crc).to_bytes(2, byteorder='little')
+        crc_bytes = crc16_checksum(src)
         src.extend(crc_bytes)
 
         base32_encoded = base64.b32encode(src)
@@ -568,6 +607,12 @@ class ErrInvalidEncoding(NkeysError):
 
     def __str__(self):
         return "nkeys: invalid encoded key"
+
+
+class ErrInvalidCheckSum(NkeysError):
+
+    def __str__(self):
+        return "nkeys: invalid crc16 checksum"
 
 
 class ErrInvalidSignature(NkeysError):
