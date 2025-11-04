@@ -45,11 +45,19 @@ namespaces = false   # to disable scanning PEP 420 namespaces (true by default)
 
 [tool.mypy]
 files = ["nkeys"]
-python_version = "3.7"
-ignore_missing_imports = true
-follow_imports = "silent"
+python_version = "3.8"
+strict = true
 show_error_codes = true
-check_untyped_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_return_any = true
+disallow_any_unimported = false
+no_implicit_reexport = true
+
+# Third-party libraries without type stubs
+[[tool.mypy.overrides]]
+module = "nacl.*"
+ignore_missing_imports = true
 
 [tool.yapf]
 split_before_first_argument = true
