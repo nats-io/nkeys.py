@@ -43,6 +43,9 @@ include = ["nkeys"]  # package names should match these glob patterns (["*"] by 
 exclude = ["tests"]  # exclude packages matching these glob patterns (empty by default)
 namespaces = false   # to disable scanning PEP 420 namespaces (true by default)
 
+[tool.setuptools.package-data]
+nkeys = ["py.typed"]
+
 [tool.mypy]
 files = ["nkeys"]
 python_version = "3.8"
