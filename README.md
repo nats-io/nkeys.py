@@ -47,7 +47,7 @@ sig = user.sign(data)
 # Verify the signature
 try: 
   user.verify(data, sig)
-except nkeys.ErrInvalidSignature as e:
+except nkeys.InvalidSignatureError as e:
   print("Error:", e)
 
 # Access the seed, the only thing that needs to be stored and kept safe.

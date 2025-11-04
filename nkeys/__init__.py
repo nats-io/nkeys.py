@@ -58,10 +58,10 @@ def decode_seed(src):
         base32_decoded = base64.b32decode(src + padding)
         raw = base32_decoded[:(len(base32_decoded) - 2)]
     except binascii.Error:
-        raise ErrInvalidSeed()
+        raise InvalidSeedError()
 
     if len(raw) < 32:
-        raise ErrInvalidSeed()
+        raise InvalidSeedError()
 
     # 248 = 11111000
     b1 = raw[0] & 248
@@ -70,9 +70,9 @@ def decode_seed(src):
     b2 = (raw[0] & 7) << 5 | ((raw[1] & 248) >> 3)
 
     if b1 != PREFIX_BYTE_SEED:
-        raise ErrInvalidSeed()
+        raise InvalidSeedError()
     elif not valid_public_prefix_byte(b2):
-        raise ErrInvalidPrefixByte()
+        raise InvalidPrefixByteError()
 
     prefix = b2
     result = raw[2:(len(raw))]
@@ -93,10 +93,10 @@ def encode_seed(src, prefix):
     """
 
     if not valid_public_prefix_byte(prefix):
-        raise ErrInvalidPrefixByte()
+        raise InvalidPrefixByteError()
 
     if len(src) != 32:
-        raise ErrInvalidSeedLen()
+        raise InvalidSeedLengthError()
 
     # The first five bits of the first byte
     # contain the first base32 character,
@@ -155,21 +155,21 @@ def verifying_nkey_to_ed25519(public_nkey):
     try:
         decoded_nkey = base64.b32decode(public_nkey)
     except Exception:
-        raise ErrInvalidEncoding()
+        raise InvalidEncodingError()
 
     if len(decoded_nkey) != 35:
-        raise ErrInvalidPublicKey()
+        raise InvalidPublicKeyError()
 
     prefix = decoded_nkey[0]
     if not valid_public_prefix_byte(prefix):
-        raise ErrInvalidPrefixByte()
+        raise InvalidPrefixByteError()
 
     # the first byte of the base32 decoded nkey is the prefix
     # the last two bytes of the base32 decoded nkey is the crc16 checksum
     key_without_checksum, checksum = decoded_nkey[:-2], decoded_nkey[-2:]
 
     if checksum != crc16_checksum(key_without_checksum):
-        raise ErrInvalidCheckSum()
+        raise InvalidChecksumError()
 
     # remove the nkey prefix to produce the bare ED25519 verifying key
     bare_key = key_without_checksum[1:]
@@ -190,7 +190,7 @@ def verify(public_nkey, input, sig):
         vk.verify(input, sig)
         return True
     except nacl.exceptions.BadSignatureError:
-        raise ErrInvalidSignature()
+        raise InvalidSignatureError()
 
 
 class KeyPair(object):
@@ -287,7 +287,7 @@ class KeyPair(object):
     @property
     def seed(self):
         if not hasattr(self, "_seed"):
-            raise ErrInvalidSeed()
+            raise InvalidSeedError()
         return self._seed
 
     def wipe(self):
@@ -573,61 +573,106 @@ class NkeysError(Exception):
     pass
 
 
-class ErrInvalidSeed(NkeysError):
+class InvalidSeedError(NkeysError):
 
     def __str__(self):
         return "nkeys: invalid seed"
 
 
-class ErrInvalidPrefixByte(NkeysError):
+class InvalidPrefixByteError(NkeysError):
 
     def __str__(self):
         return "nkeys: invalid prefix byte"
 
 
-class ErrInvalidKey(NkeysError):
+class InvalidKeyError(NkeysError):
 
     def __str__(self):
         return "nkeys: invalid key"
 
 
-class ErrInvalidPublicKey(NkeysError):
+class InvalidPublicKeyError(NkeysError):
 
     def __str__(self):
         return "nkeys: invalid public key"
 
 
-class ErrInvalidSeedLen(NkeysError):
+class InvalidSeedLengthError(NkeysError):
 
     def __str__(self):
         return "nkeys: invalid seed length"
 
 
-class ErrInvalidEncoding(NkeysError):
+class InvalidEncodingError(NkeysError):
 
     def __str__(self):
         return "nkeys: invalid encoded key"
 
 
-class ErrInvalidCheckSum(NkeysError):
+class InvalidChecksumError(NkeysError):
 
     def __str__(self):
         return "nkeys: invalid crc16 checksum"
 
 
-class ErrInvalidSignature(NkeysError):
+class InvalidSignatureError(NkeysError):
 
     def __str__(self):
         return "nkeys: signature verification failed"
 
 
-class ErrCannotSign(NkeysError):
+class CannotSignError(NkeysError):
 
     def __str__(self):
         return "nkeys: can not sign, no private key available"
 
 
-class ErrPublicKeyOnly(NkeysError):
+class PublicKeyOnlyError(NkeysError):
 
     def __str__(self):
         return "nkeys: no seed or private key available"
+
+
+# Deprecated aliases for backward compatibility.
+# These names do not follow Python naming conventions and will be removed in a future version.
+# Use the new names (suffixed with 'Error') instead.
+
+#: .. deprecated::
+#:    Use :class:`InvalidSeedError` instead.
+ErrInvalidSeed = InvalidSeedError
+
+#: .. deprecated::
+#:    Use :class:`InvalidPrefixByteError` instead.
+ErrInvalidPrefixByte = InvalidPrefixByteError
+
+#: .. deprecated::
+#:    Use :class:`InvalidKeyError` instead.
+ErrInvalidKey = InvalidKeyError
+
+#: .. deprecated::
+#:    Use :class:`InvalidPublicKeyError` instead.
+ErrInvalidPublicKey = InvalidPublicKeyError
+
+#: .. deprecated::
+#:    Use :class:`InvalidSeedLengthError` instead.
+ErrInvalidSeedLen = InvalidSeedLengthError
+
+#: .. deprecated::
+#:    Use :class:`InvalidEncodingError` instead.
+ErrInvalidEncoding = InvalidEncodingError
+
+#: .. deprecated::
+#:    Use :class:`InvalidChecksumError` instead.
+ErrInvalidCheckSum = InvalidChecksumError
+
+#: .. deprecated::
+#:    Use :class:`InvalidSignatureError` instead.
+ErrInvalidSignature = InvalidSignatureError
+
+#: .. deprecated::
+#:    Use :class:`CannotSignError` instead.
+ErrCannotSign = CannotSignError
+
+#: .. deprecated::
+#:    Use :class:`PublicKeyOnlyError` instead.
+ErrPublicKeyOnly = PublicKeyOnlyError
