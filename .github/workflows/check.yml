@@ -1,0 +1,54 @@
+name: check
+on:
+    push:
+        branches:
+            - "*"
+    pull_request:
+        branches:
+            - "*"
+jobs:
+    format:
+        runs-on: ubuntu-latest
+        name: format
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+            - name: Install dependencies
+              run: |
+                  pip install pipenv
+                  pipenv install --dev
+            - name: Check formatting
+              run: |
+                  pipenv run yapf --recursive --diff nkeys tests
+
+    lint:
+        runs-on: ubuntu-latest
+        name: lint
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+            - name: Install dependencies
+              run: |
+                  pip install pipenv
+                  pipenv install --dev
+            - name: Run flake8
+              run: pipenv run flake8 --ignore=W391 ./nkeys/
+
+    type:
+        runs-on: ubuntu-latest
+        name: type
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-python@v5
+              with:
+                  python-version: "3.11"
+            - name: Install dependencies
+              run: |
+                  pip install pipenv
+                  pipenv install --dev
+            - name: Run mypy
+              run: pipenv run mypy
