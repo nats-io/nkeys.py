@@ -1,6 +1,6 @@
 REPO_OWNER=nats-io
 PROJECT_NAME=nkeys.py
-SOURCE_CODE=nkeys
+SOURCE_CODE=src/nkeys
 
 
 help:
@@ -16,26 +16,25 @@ clean:
 
 
 deps:
-	pip install pipenv --upgrade
-	pipenv install --dev
+	uv sync --extra dev
 
 
 format:
-	yapf -i --recursive $(SOURCE_CODE)
-	yapf -i --recursive tests
+	uv run yapf -i --recursive $(SOURCE_CODE)
+	uv run yapf -i --recursive tests
 
 
 test:
-	yapf --recursive --diff $(SOURCE_CODE)
-	yapf --recursive --diff tests
-	mypy
-	flake8 ./$(SOURCE_CODE)/
-	pytest
+	uv run yapf --recursive --diff $(SOURCE_CODE)
+	uv run yapf --recursive --diff tests
+	uv run mypy
+	uv run flake8 ./$(SOURCE_CODE)/
+	uv run pytest
 
 
 ci: deps
-	pipenv run flake8 --ignore=W391 ./$(SOURCE_CODE)/ 
-	pipenv run pytest -x -vv -s --continue-on-collection-errors
+	uv run flake8 --ignore=W391 ./$(SOURCE_CODE)/
+	uv run pytest -x -vv -s --continue-on-collection-errors
 
 watch:
-	while true; do pipenv run pytest -v -s -x; sleep 10; done
+	while true; do uv run pytest -v -s -x; sleep 10; done
