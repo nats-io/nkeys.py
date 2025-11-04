@@ -56,16 +56,16 @@ class NkeysTest(NatsTestCase):
         )
 
     def test_from_seed_keypair_bad_padding(self):
-        with self.assertRaises(nkeys.ErrInvalidSeed):
+        with self.assertRaises(nkeys.InvalidSeedError):
             seed = "UAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU"
             nkeys.from_seed(bytearray(seed.encode()))
 
     def test_from_seed_keypair_invalid_seed(self):
-        with self.assertRaises(nkeys.ErrInvalidSeed):
+        with self.assertRaises(nkeys.InvalidSeedError):
             seed = "AUAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU"
             nkeys.from_seed(bytearray(seed.encode()))
 
-        with self.assertRaises(nkeys.ErrInvalidSeed):
+        with self.assertRaises(nkeys.InvalidSeedError):
             seed = ""
             nkeys.from_seed(bytearray(seed.encode()))
 
@@ -86,7 +86,7 @@ class NkeysTest(NatsTestCase):
             b'PWAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU',
             b'PMAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU'
         ]
-        with self.assertRaises(nkeys.ErrInvalidPrefixByte):
+        with self.assertRaises(nkeys.InvalidPrefixByteError):
             for seed in seeds:
                 nkeys.from_seed(bytearray(seed))
 
@@ -124,7 +124,7 @@ class NkeysTest(NatsTestCase):
         nonce = b'NcMQZSlX2lZ3Y4w'
         sig = kp.sign(nonce)
         self.assertTrue(kp.verify(nonce, sig))
-        with self.assertRaises(nkeys.ErrInvalidSignature):
+        with self.assertRaises(nkeys.InvalidSignatureError):
             kp.verify(nonce + b'asdf', sig)
 
     def test_keypair_seed_property(self):
@@ -142,7 +142,7 @@ class NkeysTest(NatsTestCase):
         # Throw away the seed.
         kp.wipe()
 
-        with self.assertRaises(nkeys.ErrInvalidSeed):
+        with self.assertRaises(nkeys.InvalidSeedError):
             kp.seed
 
     def test_keypair_public_key(self):
