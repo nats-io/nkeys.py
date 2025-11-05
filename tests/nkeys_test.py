@@ -20,11 +20,9 @@ import base64
 import os
 
 PREFIXES = [
-        nkeys.PREFIX_BYTE_OPERATOR,
-        nkeys.PREFIX_BYTE_SERVER,
-        nkeys.PREFIX_BYTE_CLUSTER,
-        nkeys.PREFIX_BYTE_ACCOUNT,
-        nkeys.PREFIX_BYTE_USER
+    nkeys.PREFIX_BYTE_OPERATOR, nkeys.PREFIX_BYTE_SERVER,
+    nkeys.PREFIX_BYTE_CLUSTER, nkeys.PREFIX_BYTE_ACCOUNT,
+    nkeys.PREFIX_BYTE_USER
 ]
 
 
@@ -191,7 +189,9 @@ class NkeysTest(NatsTestCase):
             for prefix in PREFIXES:
                 with self.subTest(rawseed=raw_seed, prefix=prefix):
                     encoded_seed = nkeys.encode_seed(raw_seed, prefix)
-                    decoded_prefix, decoded_seed = nkeys.decode_seed(encoded_seed)
+                    decoded_prefix, decoded_seed = nkeys.decode_seed(
+                        encoded_seed
+                    )
                     self.assertEqual(prefix, decoded_prefix)
                     self.assertEqual(raw_seed, decoded_seed)
 
