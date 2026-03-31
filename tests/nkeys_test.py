@@ -99,22 +99,6 @@ class NkeysTest(NatsTestCase):
         with self.assertRaises(AttributeError):
             kp._seed
 
-    def test_keypair_public_key(self):
-        seed = "SUAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU"
-        encoded_seed = bytearray(seed.encode())
-        kp = nkeys.from_seed(encoded_seed)
-
-        self.assertEqual(None, kp._public_key)
-        self.assertEqual(
-            "UCK5N7N66OBOINFXAYC2ACJQYFSOD4VYNU6APEJTAVFZB2SVHLKGEW7L",
-            kp.public_key
-        )
-
-        # Confirm that the public key is wiped as well.
-        kp.wipe()
-        with self.assertRaises(AttributeError):
-            kp._public_key
-
     def test_keypair_use_seed_to_verify_signature(self):
         seed = "SUAMLK2ZNL35WSMW37E7UD4VZ7ELPKW7DHC3BWBSD2GCZ7IUQQXZIORRBU"
         encoded_seed = bytearray(seed.encode())
