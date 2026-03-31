@@ -1,7 +1,8 @@
 # NKEYS for Python3
 
 [![License Apache 2](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-[![Build Status](https://travis-ci.org/nats-io/nkeys.py.svg?branch=master)](http://travis-ci.org/nats-io/nkeys.py)
+[![Test](https://github.com/nats-io/nkeys.py/actions/workflows/test.yml/badge.svg)](https://github.com/nats-io/nkeys.py/actions/workflows/test.yml)
+[![Check](https://github.com/nats-io/nkeys.py/actions/workflows/check.yml/badge.svg)](https://github.com/nats-io/nkeys.py/actions/workflows/check.yml)
 [![pypi](https://img.shields.io/pypi/v/nkeys.svg)](https://pypi.org/project/nkeys)
 [![Versions](https://img.shields.io/pypi/pyversions/nkeys.svg)](https://pypi.org/project/nkeys)
 
